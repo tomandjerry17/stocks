@@ -6,7 +6,7 @@ class AuthService {
 
   // Add the clientId here
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com", // Replace with actual Web Client ID
+    clientId: "515997175207-r353s1ja0tg2cgk6fqkrtlvdk65cdhvj.apps.googleusercontent.com", // Replace with actual Web Client ID
   );
 
   // Email & Password Sign-In

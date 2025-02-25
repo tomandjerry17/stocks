@@ -23,6 +23,7 @@ flutter:
 
   assets:
   - Assets/logo.png
+  - Assets/google_logo.png
   #  - images/a_dot_ham.jpeg
   # fonts:
   #   - family: Schyler

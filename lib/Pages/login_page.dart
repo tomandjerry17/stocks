@@ -154,8 +154,9 @@ class _LoginPageState extends State<LoginPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image.network(
-                        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png",
+                      Image.asset(
+                        'Assets/google_logo.png',
+                        width: 24,
                         height: 24,
                       ),
                       SizedBox(width: 10),

@@ -1,7 +1,72 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
+import '../services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
+  @override
+  _SignUpPageState createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController surnameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+
+  final AuthService _authService = AuthService();
+
+  void _signUp() async {
+    String firstName = firstNameController.text.trim();
+    String surname = surnameController.text.trim();
+    String email = emailController.text.trim();
+    String phone = phoneController.text.trim();
+    String password = passwordController.text.trim();
+    String confirmPassword = confirmPasswordController.text.trim();
+
+    // **Validate user input**
+    if (firstName.isEmpty || surname.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill in all fields")),
+      );
+      return;
+    }
+    
+    if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Password must be at least 6 characters long")),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Passwords do not match")),
+      );
+      return;
+    }
+
+    // **Create user account**
+    User? user = await _authService.signUpWithEmail(email, password);
+    if (user != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Account created successfully! Please log in.")),
+      );
+
+      // Navigate to Login Page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Sign-up failed. Try again.")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,6 +92,7 @@ class SignUpPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: firstNameController,
                         decoration: InputDecoration(
                           hintText: 'First name',
                           border: OutlineInputBorder(
@@ -40,6 +106,7 @@ class SignUpPage extends StatelessWidget {
                     SizedBox(width: 8),
                     Expanded(
                       child: TextField(
+                        controller: surnameController,
                         decoration: InputDecoration(
                           hintText: 'Surname',
                           border: OutlineInputBorder(
@@ -54,6 +121,7 @@ class SignUpPage extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 TextField(
+                  controller: emailController,
                   decoration: InputDecoration(
                     hintText: 'Email address',
                     border: OutlineInputBorder(
@@ -65,6 +133,7 @@ class SignUpPage extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 TextField(
+                  controller: phoneController,
                   decoration: InputDecoration(
                     hintText: 'Number',
                     border: OutlineInputBorder(
@@ -76,6 +145,7 @@ class SignUpPage extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 TextField(
+                  controller: passwordController,
                   decoration: InputDecoration(
                     hintText: 'Password',
                     border: OutlineInputBorder(
@@ -88,6 +158,7 @@ class SignUpPage extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 TextField(
+                  controller: confirmPasswordController,
                   decoration: InputDecoration(
                     hintText: 'Confirm password',
                     border: OutlineInputBorder(
@@ -100,7 +171,7 @@ class SignUpPage extends StatelessWidget {
                 ),
                 SizedBox(height: 32),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _signUp,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF1B5E20),
                     padding: EdgeInsets.symmetric(vertical: 16.0),

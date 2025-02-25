@@ -26,14 +26,21 @@ class _SignUpPageState extends State<SignUpPage> {
     String password = passwordController.text.trim();
     String confirmPassword = confirmPasswordController.text.trim();
 
-    // **Validate user input**
+    // **Validation**
     if (firstName.isEmpty || surname.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please fill in all fields")),
       );
       return;
     }
-    
+
+    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Enter a valid email address")),
+      );
+      return;
+    }
+
     if (password.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Password must be at least 6 characters long")),
@@ -50,6 +57,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     // **Create user account**
     User? user = await _authService.signUpWithEmail(email, password);
+
     if (user != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Account created successfully! Please log in.")),
@@ -71,142 +79,145 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFE0F7DA),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Stock Up',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF388E3C),
-                    fontFamily: 'Roboto',
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(), // Hide keyboard on tap
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Stock Up',
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF388E3C),
+                      fontFamily: 'Roboto',
+                    ),
                   ),
-                ),
-                SizedBox(height: 32),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: firstNameController,
-                        decoration: InputDecoration(
-                          hintText: 'First name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
+                  SizedBox(height: 32),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: firstNameController,
+                          decoration: InputDecoration(
+                            hintText: 'First name',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
                           ),
-                          filled: true,
-                          fillColor: Colors.white,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: surnameController,
+                          decoration: InputDecoration(
+                            hintText: 'Surname',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      hintText: 'Email address',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: phoneController,
+                    decoration: InputDecoration(
+                      hintText: 'Phone Number',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: confirmPasswordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      hintText: 'Confirm password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: _signUp,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF1B5E20),
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Create Account',
+                        style: TextStyle(
+                          color: Color(0xFFFFA000),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: surnameController,
-                        decoration: InputDecoration(
-                          hintText: 'Surname',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    hintText: 'Email address',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
                   ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: phoneController,
-                  decoration: InputDecoration(
-                    hintText: 'Number',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                    hintText: 'Password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                  obscureText: true,
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: confirmPasswordController,
-                  decoration: InputDecoration(
-                    hintText: 'Confirm password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                  obscureText: true,
-                ),
-                SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: _signUp,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF1B5E20),
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  child: Center(
+                  SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
+                    },
                     child: Text(
-                      'Create Account',
+                      'Back to Log in',
                       style: TextStyle(
                         color: Color(0xFFFFA000),
-                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    );
-                  },
-                  child: Text(
-                    'Back to Log in',
-                    style: TextStyle(
-                      color: Color(0xFFFFA000),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -16,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final AuthService _authService = AuthService();
 
+  // Function for Email/Password login
   void _login() async {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
@@ -37,6 +38,22 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Login failed. Check credentials.")),
+      );
+    }
+  }
+
+  // Function for Google Sign-In
+  void _loginWithGoogle() async {
+    User? user = await _authService.signInWithGoogle();
+
+    if (user != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SalesReportPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google Sign-In failed. Please try again.")),
       );
     }
   }
@@ -70,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 48),
 
-              // Input fields
+              // Email Input
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -84,6 +101,8 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 16),
+
+              // Password Input
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -99,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 24),
 
-              // Login button
+              // Login Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -121,6 +140,35 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 16),
+
+              // Google Sign-In Button
+              GestureDetector(
+                onTap: _loginWithGoogle,
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.network(
+                        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png",
+                        height: 24,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "Sign in with Google",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
               // Forgotten password
               TextButton(
                 onPressed: () {},

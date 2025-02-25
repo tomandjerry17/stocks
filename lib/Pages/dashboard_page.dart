@@ -1,8 +1,24 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'login_page.dart';
 
 class SalesReportPage extends StatelessWidget {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Sign out function
+  void _signOut(BuildContext context) async {
+    await _auth.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Get current user
+    User? user = _auth.currentUser;
+
     return Scaffold(
       backgroundColor: Colors.green[100],
       appBar: AppBar(
@@ -11,12 +27,17 @@ class SalesReportPage extends StatelessWidget {
           children: [
             CircleAvatar(
               backgroundImage: NetworkImage(
-                  'https://storage.googleapis.com/a1aa/image/I5CF7vUQhji5uHBe_W00_NaP6VvehExNQRlmZz7oXzA.jpg'),
+                user?.photoURL ??
+                    'https://storage.googleapis.com/a1aa/image/I5CF7vUQhji5uHBe_W00_NaP6VvehExNQRlmZz7oXzA.jpg', // Default image
+              ),
             ),
             SizedBox(width: 10),
-            Text('Bea Lagayada'),
+            Text(user?.displayName ?? "User"),
             Spacer(),
-            Icon(Icons.menu),
+            IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () => _signOut(context),
+            ),
           ],
         ),
       ),
@@ -34,32 +55,24 @@ class SalesReportPage extends StatelessWidget {
                 children: [
                   Text(
                     'SALES REPORT',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
                   Text('DATE: 02-07-2025'),
                   SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Sales'),
-                      Text('₱100.00'),
-                    ],
+                    children: [Text('Sales'), Text('₱100.00')],
                   ),
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Profit'),
-                      Text('₱100.00'),
-                    ],
+                    children: [Text('Profit'), Text('₱100.00')],
                   ),
                 ],
               ),
             ),
+            // CATEGORIES
             Container(
               margin: EdgeInsets.all(16),
               padding: EdgeInsets.all(16),
@@ -71,12 +84,9 @@ class SalesReportPage extends StatelessWidget {
                 children: [
                   Text(
                     'CATEGORIES',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
-                  // Horizontal Scrollable Categories
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -112,6 +122,7 @@ class SalesReportPage extends StatelessWidget {
                 ],
               ),
             ),
+            // PRODUCTS
             Container(
               margin: EdgeInsets.all(16),
               padding: EdgeInsets.all(16),
@@ -123,9 +134,7 @@ class SalesReportPage extends StatelessWidget {
                 children: [
                   Text(
                     'Products',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
                   GridView.count(
@@ -146,33 +155,6 @@ class SalesReportPage extends StatelessWidget {
                         imageUrl:
                             'https://storage.googleapis.com/a1aa/image/YF37zjzxkArW99oVCrjhcPE7-zcK5thvb4YpVPC-bx8.jpg',
                       ),
-                      ProductItem(
-                        imageUrl:
-                            'https://storage.googleapis.com/a1aa/image/vbNU6VAhzd8hzCRBt37HNesM-wOBf3EcHkk5RDPFdbc.jpg',
-                      ),
-                      ProductItem(
-                        imageUrl:
-                            'https://storage.googleapis.com/a1aa/image/G6AH03ryDExjNDiTnxOk2jjIaQ5Me20MNhh2m57k1BI.jpg',
-                        quantity: 1,
-                      ),
-                      ProductItem(
-                        imageUrl:
-                            'https://storage.googleapis.com/a1aa/image/dfomPsGKVT9aouk4xXYEGTst9UF-pfMcca2iCuG9YVs.jpg',
-                      ),
-                      ProductItem(
-                        imageUrl:
-                            'https://storage.googleapis.com/a1aa/image/IHwQXGKSjHzQqiuGs1TWMxOLQyShrKshQVw9fxubBrg.jpg',
-                      ),
-                      ProductItem(
-                        imageUrl:
-                            'https://storage.googleapis.com/a1aa/image/aJjqlA4A7M8LcyQqaJAZiW8nKa4k7U86QRQgmXgSw7c.jpg',
-                        quantity: 4,
-                      ),
-                      ProductItem(
-                        imageUrl:
-                            'https://storage.googleapis.com/a1aa/image/uQbcVjoNW3sxiXvGrteCgvwBC-vf5zllFfvkI-u3i3w.jpg',
-                        quantity: 3,
-                      ),
                     ],
                   ),
                 ],
@@ -185,9 +167,8 @@ class SalesReportPage extends StatelessWidget {
         backgroundColor: Colors.green[900],
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white.withOpacity(0.5),
-        currentIndex: 0, // Set the current index to highlight the selected page
+        currentIndex: 0,
         onTap: (index) {
-          // Disable navigation if the current page is already open
           if (index == 0) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -195,30 +176,19 @@ class SalesReportPage extends StatelessWidget {
                 duration: Duration(seconds: 1),
               ),
             );
-          } else {
-            // Handle navigation to other pages
-            // Example: Navigator.push(context, MaterialPageRoute(builder: (context) => OtherPage()));
           }
         },
         items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Transactions',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'History',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Dashboard'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Transactions'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
       ),
     );
   }
 }
 
+// CATEGORY ITEM WIDGET
 class CategoryItem extends StatelessWidget {
   final String imageUrl;
   final String label;
@@ -245,6 +215,7 @@ class CategoryItem extends StatelessWidget {
   }
 }
 
+// PRODUCT ITEM WIDGET
 class ProductItem extends StatelessWidget {
   final String imageUrl;
   final int? quantity;

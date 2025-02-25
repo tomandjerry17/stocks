@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart'; // Import the generated options file
 import 'Pages/login_page.dart';
-//import 'Pages/dashboard_page.dart';
-//import 'Pages/signup_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensures Flutter is ready
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(MyApp());
 }
 
@@ -15,9 +20,4 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
     );
   }
-}
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold();
 }

@@ -17,6 +17,8 @@ class _LoginPageState extends State<LoginPage> {
   final AuthService _authService = AuthService();
 
   // Function for Email/Password login
+  bool _isLoading = false; // Add this to track loading state
+
   void _login() async {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
@@ -28,19 +30,33 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    User? user = await _authService.signInWithEmail(email, password);
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SalesReportPage()),
-      );
-    } else {
+    try {
+      User? user = await _authService.signInWithEmail(email, password);
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SalesReportPage()),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login failed. Check credentials.")),
+        SnackBar(content: Text(e.toString())),
       );
     }
   }
+
 
   // Function for Google Sign-In
   void _loginWithGoogle() async {
@@ -122,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _login,
+                  onPressed: _isLoading ? null : _login, // Disable button while loading
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -130,15 +146,15 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    'Log in',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white, // White text color
-                    ),
-                  ),
+                  child: _isLoading
+                      ? CircularProgressIndicator(color: Colors.white) // Show loader
+                      : const Text(
+                          'Log in',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                 ),
               ),
+
               const SizedBox(height: 16),
 
               // Google Sign-In Button

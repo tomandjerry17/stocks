@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'login_page.dart';
 import '../services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -55,10 +56,20 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
 
-    // **Create user account**
+    // **Create user in Firebase Authentication**
     User? user = await _authService.signUpWithEmail(email, password);
 
     if (user != null) {
+      // **Store additional user info in Firestore**
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'firstName': firstName,
+        'surname': surname,
+        'email': email,
+        'phone': phone,
+        'uid': user.uid, 
+        'createdAt': FieldValue.serverTimestamp(), // Store timestamp
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Account created successfully! Please log in.")),
       );

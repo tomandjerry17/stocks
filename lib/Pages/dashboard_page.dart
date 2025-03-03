@@ -1,11 +1,20 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
+import 'transactions_page.dart';
+import 'history_page.dart';
+import 'profile_page.dart';
 
-class SalesReportPage extends StatelessWidget {
+class SalesReportPage extends StatefulWidget {
+  @override
+  _SalesReportPageState createState() => _SalesReportPageState();
+}
+
+class _SalesReportPageState extends State<SalesReportPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  int _selectedIndex = 0; // Default selected tab (Dashboard)
 
-  // Sign out function
+  // Function to handle sign out
   void _signOut(BuildContext context) async {
     await _auth.signOut();
     Navigator.pushReplacement(
@@ -14,9 +23,39 @@ class SalesReportPage extends StatelessWidget {
     );
   }
 
+  // Navigation function for bottom tabs
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Navigate to corresponding page
+    switch (index) {
+      case 0:
+        break; // Stay on Dashboard
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TransactionsPage()),
+        );
+        break;
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HistoryPage()),
+        );
+        break;
+      case 3:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ProfilePage()), // Navigate to Profile
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Get current user
     User? user = _auth.currentUser;
 
     return Scaffold(
@@ -72,7 +111,7 @@ class SalesReportPage extends StatelessWidget {
                 ],
               ),
             ),
-            // CATEGORIES
+            // Categories Section
             Container(
               margin: EdgeInsets.all(16),
               padding: EdgeInsets.all(16),
@@ -122,44 +161,6 @@ class SalesReportPage extends StatelessWidget {
                 ],
               ),
             ),
-            // PRODUCTS
-            Container(
-              margin: EdgeInsets.all(16),
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    'Products',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                  GridView.count(
-                    crossAxisCount: 3,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    children: [
-                      ProductItem(
-                        imageUrl:
-                            'https://storage.googleapis.com/a1aa/image/hyeNtE8GyQWR7W0UH2WtBcHffM_aeKHo0RwRqU-1c9M.jpg',
-                        quantity: 1,
-                      ),
-                      ProductItem(
-                        imageUrl:
-                            'https://storage.googleapis.com/a1aa/image/BSXhxyXbsGR8gup6rSbUBKyTGLFtlIJYUvxF1w-r7OU.jpg',
-                      ),
-                      ProductItem(
-                        imageUrl:
-                            'https://storage.googleapis.com/a1aa/image/YF37zjzxkArW99oVCrjhcPE7-zcK5thvb4YpVPC-bx8.jpg',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -167,28 +168,20 @@ class SalesReportPage extends StatelessWidget {
         backgroundColor: Colors.green[900],
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white.withOpacity(0.5),
-        currentIndex: 0,
-        onTap: (index) {
-          if (index == 0) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('You are already on the Dashboard page.'),
-                duration: Duration(seconds: 1),
-              ),
-            );
-          }
-        },
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Dashboard'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Transactions'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'), // New Profile Tab
         ],
       ),
     );
   }
 }
 
-// CATEGORY ITEM WIDGET
+// Category Widget
 class CategoryItem extends StatelessWidget {
   final String imageUrl;
   final String label;
@@ -210,43 +203,6 @@ class CategoryItem extends StatelessWidget {
             Text(label),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// PRODUCT ITEM WIDGET
-class ProductItem extends StatelessWidget {
-  final String imageUrl;
-  final int? quantity;
-
-  ProductItem({required this.imageUrl, this.quantity});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        print('Product tapped: $imageUrl');
-      },
-      child: Stack(
-        children: [
-          Center(
-            child: Image.network(imageUrl, height: 100, width: 100),
-          ),
-          if (quantity != null)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: CircleAvatar(
-                radius: 12,
-                backgroundColor: Colors.green[500],
-                child: Text(
-                  '$quantity',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-        ],
       ),
     );
   }
